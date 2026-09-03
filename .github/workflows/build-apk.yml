@@ -67,7 +67,7 @@ jobs:
 
       - name: 🔨 Build Android APK
         working-directory: android
-        run: ./gradlew assembleDebug --no-daemon
+        run: ./gradlew assembleRelease --no-daemon
 
       - name: 🔑 Output SHA-1 Certificate Fingerprint
         run: |
@@ -90,5 +90,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: KhelDeck-Android-APK
-          path: android/app/build/outputs/apk/debug/*.apk
+          path: android/app/build/outputs/apk/release/*.apk
           if-no-files-found: error

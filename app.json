@@ -7,9 +7,11 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": false,
     "splash": {
+      "image": "./assets/icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#0B0F19"
     },
+    "icon": "./assets/icon.png",
     "ios": {
       "supportsTablet": true
     },
@@ -17,6 +19,7 @@
       "package": "com.engaurav.kheldeck",
       "googleServicesFile": "./secret/google-services.json",
       "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#0B0F19"
       }
     },
