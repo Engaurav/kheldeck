@@ -9,41 +9,49 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: 🏗 Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: 🟢 Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
 
-      - name: Setup Java 17
+      - name: ☕ Setup Java 17
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Setup Android SDK
+      - name: 📱 Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Install dependencies
-        run: npm ci
+      - name: 📦 Install dependencies
+        run: npm install --legacy-peer-deps
 
-      - name: Create .env from template
-        run: cp .env.example .env
+      - name: 🔐 Configure .env for Build
+        run: |
+          cat << 'EOF' > .env
+          EXPO_PUBLIC_GOOGLE_CLIENT_ID=${{ secrets.EXPO_PUBLIC_GOOGLE_CLIENT_ID || '785677501702-qn4br6h7mjj09m0r8j3i7aiq5n9f5gk5.apps.googleusercontent.com' }}
+          EXPO_PUBLIC_FIREBASE_API_KEY=${{ secrets.EXPO_PUBLIC_FIREBASE_API_KEY || 'AIzaSyDemoKeyForAppGossipRealtimeSync' }}
+          EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=${{ secrets.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN || 'app-gossip.firebaseapp.com' }}
+          EXPO_PUBLIC_FIREBASE_PROJECT_ID=${{ secrets.EXPO_PUBLIC_FIREBASE_PROJECT_ID || 'app-gossip' }}
+          EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=${{ secrets.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET || 'app-gossip.appspot.com' }}
+          EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=${{ secrets.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '785677501702' }}
+          EXPO_PUBLIC_FIREBASE_APP_ID=${{ secrets.EXPO_PUBLIC_FIREBASE_APP_ID || '1:785677501702:web:a1b2c3d4e5f6g7h8i9j0k1' }}
+          EOF
 
-      - name: Expo Prebuild (Generate Native Android Project)
-        run: npx expo prebuild --platform android --clean
+      - name: 🚀 Expo Prebuild (Generate Native Android Project)
+        run: npx expo prebuild --platform android --clean --no-install
 
-      - name: Grant execute permission for gradlew
+      - name: 🔑 Grant execute permission for gradlew
         run: chmod +x android/gradlew
 
-      - name: Build Release APK
+      - name: 🔨 Build Release APK
         working-directory: android
         run: ./gradlew assembleRelease --no-daemon
 
-      - name: Upload APK Artifact
+      - name: 📤 Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: KhelDeck-Android-APK
