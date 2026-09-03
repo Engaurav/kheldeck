@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "Game Track",
-    "slug": "game-track",
+    "name": "KhelDeck - Game Track",
+    "slug": "kheldeck",
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "splash": {
       "resizeMode": "contain",
       "backgroundColor": "#0B0F19"
@@ -14,7 +14,10 @@
       "supportsTablet": true
     },
     "android": {
-      "package": "com.gametrack.app"
+      "package": "com.engaurav.kheldeck",
+      "adaptiveIcon": {
+        "backgroundColor": "#0B0F19"
+      }
     },
     "web": {
       "bundler": "metro"
