@@ -46,6 +46,19 @@ jobs:
             echo "EXPO_PUBLIC_FIREBASE_APP_ID=${{ secrets.EXPO_PUBLIC_FIREBASE_APP_ID }}" >> .env
           fi
 
+      - name: 🛡️ Setup Persistent Keystore
+        run: |
+          mkdir -p keystore
+          if [ ! -f "keystore/debug.keystore" ]; then
+            echo "Generating new persistent debug keystore..."
+            keytool -genkey -v -keystore keystore/debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+          else
+            echo "Using existing persistent debug keystore from repository."
+          fi
+          # Tell Gradle to use this keystore by putting it where it expects the default debug keystore
+          mkdir -p ~/.android
+          cp keystore/debug.keystore ~/.android/debug.keystore
+
       - name: 🚀 Expo Prebuild (Generate Native Android Project)
         run: npx expo prebuild --platform android --clean --no-install
 
@@ -56,17 +69,22 @@ jobs:
         working-directory: android
         run: ./gradlew assembleDebug --no-daemon
 
-      - name: 🔑 Output SHA-1 Certificate Fingerprint from APK
+      - name: 🔑 Output SHA-1 Certificate Fingerprint
         run: |
-          APK_FILE=$(ls android/app/build/outputs/apk/debug/*.apk | head -n 1)
-          echo "Inspecting APK: $APK_FILE"
           echo "==================== ANDROID APK CERTIFICATE FINGERPRINTS ===================="
-          keytool -printcert -jarfile "$APK_FILE" || true
+          keytool -list -v -keystore keystore/debug.keystore -alias androiddebugkey -storepass android -keypass android || true
           echo "============================================================================="
           echo "### 🔑 Android APK Certificate Info" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          keytool -printcert -jarfile "$APK_FILE" >> $GITHUB_STEP_SUMMARY || true
+          keytool -list -v -keystore keystore/debug.keystore -alias androiddebugkey -storepass android -keypass android | grep -iE "SHA1|SHA256" >> $GITHUB_STEP_SUMMARY || true
           echo '```' >> $GITHUB_STEP_SUMMARY
+
+      - name: 📤 Upload Keystore Artifact (If newly generated)
+        uses: actions/upload-artifact@v4
+        with:
+          name: KhelDeck-Keystore
+          path: keystore/debug.keystore
+          if-no-files-found: ignore
 
       - name: 📤 Upload APK Artifact
         uses: actions/upload-artifact@v4
