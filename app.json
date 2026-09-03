@@ -1,0 +1,23 @@
+{
+  "expo": {
+    "name": "Game Track",
+    "slug": "game-track",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#0B0F19"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "package": "com.gametrack.app"
+    },
+    "web": {
+      "bundler": "metro"
+    }
+  }
+}
