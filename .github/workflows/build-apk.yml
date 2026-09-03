@@ -56,11 +56,15 @@ jobs:
         working-directory: android
         run: ./gradlew assembleDebug --no-daemon
 
-      - name: 🔑 Output SHA-1 Certificate Fingerprint
+      - name: 🔑 Output SHA-1 Certificate Fingerprint from APK
         run: |
-          echo "==================== ANDROID SHA-1 FINGERPRINT ===================="
-          keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android | grep -E "SHA1:|SHA256:"
-          echo "==================================================================="
+          APK_FILE=$(ls android/app/build/outputs/apk/debug/*.apk | head -n 1)
+          echo "Inspecting APK: $APK_FILE"
+          echo "==================== ANDROID APK CERTIFICATE FINGERPRINTS ===================="
+          keytool -printcert -jarfile "$APK_FILE" | grep -iE "SHA1|SHA256" || true
+          echo "============================================================================="
+          echo "### 🔑 Android APK Fingerprint (For Google OAuth)" >> $GITHUB_STEP_SUMMARY
+          keytool -printcert -jarfile "$APK_FILE" | grep -iE "SHA1|SHA256" >> $GITHUB_STEP_SUMMARY || true
 
       - name: 📤 Upload APK Artifact
         uses: actions/upload-artifact@v4
