@@ -9,11 +9,12 @@ import {
   TextInput,
   Image,
   Platform,
+  Alert,
 } from 'react-native';
 import { useTheme } from '../core/theme/ThemeContext';
 import { useAuth } from '../core/auth/AuthContext';
 import { generateGoogleBackupJson, restoreGoogleBackupJson, getMatchHistory, saveCompletedMatch } from '../core/storage/storage';
-import { launchGoogleOAuthPopup, GOOGLE_CLIENT_ID } from '../core/auth/GoogleAuthService';
+import { launchGoogleOAuthPopup, launchNativeGoogleSignIn, GOOGLE_CLIENT_ID } from '../core/auth/GoogleAuthService';
 import { syncUserProfileToFirestore, syncAllMatchesToFirestore, fetchUserMatchesFromFirestore } from '../core/firebase/firestoreService';
 import { LiquidGlassCard } from '../components/common/LiquidGlassCard';
 import { X, Copy, Check, Download, Upload, LogOut, ShieldCheck, Sparkles, FileText, User, AlertCircle, Key, Cloud, RefreshCw, Database } from 'lucide-react-native';
@@ -82,17 +83,31 @@ export const GoogleSignInModal: React.FC<GoogleSignInModalProps> = ({
 
   const handleRealGoogleOAuth = () => {
     setOauthError(null);
-    launchGoogleOAuthPopup(
-      GOOGLE_CLIENT_ID,
-      async (profile) => {
-        await setVerifiedGoogleUser(profile);
-        if (onSuccess) onSuccess();
-        onClose();
-      },
-      (err) => {
-        setOauthError(err);
-      }
-    );
+    
+    if (Platform.OS === 'web') {
+      launchGoogleOAuthPopup(
+        GOOGLE_CLIENT_ID,
+        async (profile) => {
+          await setVerifiedGoogleUser(profile);
+          if (onSuccess) onSuccess();
+          onClose();
+        },
+        (err) => {
+          setOauthError(err);
+        }
+      );
+    } else {
+      launchNativeGoogleSignIn(
+        async (profile) => {
+          await setVerifiedGoogleUser(profile);
+          if (onSuccess) onSuccess();
+          onClose();
+        },
+        (err) => {
+          setOauthError(err);
+        }
+      );
+    }
   };
 
   const handleContinueAsGuest = () => {
